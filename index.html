@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>QUANT · an AI that trades StonkFun</title>
+<meta name="description" content="QUANT's creator fees fund an AI that trades StonkFun coins live. Every trade and its reason is on-chain. Half of every winning trade buys and burns $QUANT.">
+<meta name="theme-color" content="#071013">
+<meta property="og:title" content="QUANT">
+<meta property="og:description" content="An AI that trades StonkFun coins live. Its wins buy and burn $QUANT.">
+<meta property="og:image" content="og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: reference-style product page — nav · hero (copy + live CRT terminal) · stats strip · holdings · tape · radar · how · rules/verify */
+:root{
+  --bg:#071013; --bg2:#0a171c; --bg3:#0f2129; --line:#15303a; --line2:#1f4250;
+  --steel:#a4c5cf; --steel2:#6f929d; --steel3:#3c5c67; --ice:#d9ecf1; --mint:#7ff0c8; --mint2:#3fcf9f; --loss:#f29a8f;
+  --ink:#e4f1f4; --mute:#7f9aa3; --dim:#4a6670;
+  --px:"Silkscreen",ui-monospace,monospace; --sans:"DM Sans",ui-sans-serif,system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--sans);overflow-x:clip;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+::selection{background:var(--mint);color:var(--bg)}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:
+  radial-gradient(900px 500px at 75% 18%,#0f2a3133,transparent 70%),
+  radial-gradient(1px 1px at 20% 30%,#a4c5cf55 50%,transparent 51%),
+  radial-gradient(1px 1px at 70% 80%,#a4c5cf44 50%,transparent 51%);}
+main,header,footer{position:relative;z-index:1}
+
+/* nav */
+.nav{position:sticky;top:0;z-index:30;background:#071013e6;backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:26px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font:700 17px var(--px);letter-spacing:.06em}
+.brand img{width:30px;height:30px;image-rendering:pixelated;border-radius:6px}
+.links{display:flex;gap:22px;font-size:14px;color:var(--mute)}
+.links a:hover{color:var(--ink)}
+.sp{flex:1}
+.pill{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px;border:1px solid var(--line2);border-radius:10px;font:500 13px var(--mono);color:var(--steel);background:var(--bg2);transition:border-color .2s,color .2s}
+.pill:hover{border-color:var(--steel2);color:var(--ink)}
+.pill.solid{background:var(--ice);color:var(--bg);border-color:var(--ice);font-family:var(--px);font-size:12px;letter-spacing:.04em}
+.pill.solid:hover{background:#fff}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.02fr 1fr;gap:48px;align-items:center;padding-block:64px 40px}
+.live{display:inline-flex;align-items:center;gap:9px;font:500 11.5px var(--mono);letter-spacing:.16em;color:var(--steel);text-transform:uppercase}
+.live i{width:8px;height:8px;background:var(--dim);box-shadow:none}
+.live.on i{background:var(--mint);animation:blink 1.2s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+.live b{border:1px solid var(--line2);padding:2px 7px;font-weight:500;letter-spacing:.08em;color:var(--mute)}
+h1{font:700 clamp(38px,5.2vw,68px)/1.02 var(--sans);letter-spacing:-.03em;margin-top:20px;text-wrap:balance}
+h1 .px{font-family:var(--px);font-weight:400;letter-spacing:0;color:var(--mint);font-size:.86em}
+.sub{font-size:18px;line-height:1.55;color:var(--mute);margin-top:20px;max-width:46ch}
+.sub b{color:var(--ink);font-weight:500}
+.ctas{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.ctas .pill{height:46px;padding:0 18px}
+
+/* CRT */
+.crt{position:relative;perspective:1200px}
+.monitor{position:relative;transform-style:preserve-3d;transition:transform .25s ease-out}
+#bezel{width:100%;display:block;image-rendering:pixelated}
+#screen{position:absolute;display:block;image-rendering:auto}
+.crt .cap{position:absolute;left:0;right:0;bottom:-30px;text-align:center;font:500 11px var(--mono);letter-spacing:.16em;color:var(--dim)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid var(--line);border-radius:16px;background:var(--bg2);overflow:hidden;margin-top:34px}
+.stat{padding:20px 20px 18px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:8px;min-width:0}
+.stat:first-child{border-left:0}
+.stat .k{font:400 10px var(--px);letter-spacing:.06em;color:var(--dim)}
+.stat .v{font:600 24px var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat .v small{font-size:12px;color:var(--mute);font-weight:500;margin-left:4px}
+.stat .s{font:12px var(--mono);color:var(--mute)}
+.up{color:var(--mint)} .dn{color:var(--loss)}
+
+/* sections */
+section{padding-block:86px 0}
+.eyebrow{font:400 11px var(--px);letter-spacing:.08em;color:var(--mint);display:flex;align-items:center;gap:10px}
+.eyebrow svg{width:16px;height:16px}
+h2{font:700 clamp(28px,3.6vw,44px)/1.05 var(--sans);letter-spacing:-.025em;margin-top:14px;text-wrap:balance}
+h2 .m{color:var(--steel3)}
+.lede{color:var(--mute);font-size:16.5px;line-height:1.55;max-width:60ch;margin-top:12px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+
+/* positions */
+.pos{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:30px}
+.pcard{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--bg2),var(--bg));padding:18px;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.pcard::after{content:"";position:absolute;inset:0 0 auto 0;height:2px;background:var(--line2)}
+.pcard.win::after{background:var(--mint)} .pcard.lose::after{background:var(--loss)}
+.pcard .h{display:flex;align-items:center;gap:10px}
+.pcard img{width:34px;height:34px;border-radius:8px;object-fit:cover;background:var(--bg3);border:1px solid var(--line)}
+.pcard .n{font-weight:700;font-size:16px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard .pnl{font:700 15px var(--mono)}
+.pcard .th{font:13px/1.45 var(--mono);color:var(--steel);border-left:2px solid var(--line2);padding-left:10px;min-height:2.9em}
+.pcard .f{display:flex;justify-content:space-between;gap:8px;font:12px var(--mono);color:var(--mute);flex-wrap:wrap}
+.pcard .f b{color:var(--ink);font-weight:500}
+.empty{border:1px dashed var(--line2);border-radius:14px;padding:30px;text-align:center;color:var(--mute);font:13px var(--mono);grid-column:1/-1}
+.sk{display:inline-block;height:.9em;min-width:4em;border-radius:3px;background:linear-gradient(90deg,var(--bg3),var(--line2),var(--bg3));background-size:200% 100%;animation:sk 1.4s linear infinite;vertical-align:middle}
+@keyframes sk{to{background-position:-200% 0}}
+
+/* tables */
+.tbl{margin-top:30px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--bg2)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font:13px var(--mono);font-variant-numeric:tabular-nums;min-width:720px}
+th{font:400 10px var(--px);letter-spacing:.06em;color:var(--dim);text-align:left;padding:13px 16px;border-bottom:1px solid var(--line);background:var(--bg)}
+td{padding:13px 16px;border-top:1px solid var(--line);vertical-align:middle}
+tr:first-child td{border-top:0}
+td.r,th.r{text-align:right}
+td .coin{display:flex;align-items:center;gap:9px;font-weight:600}
+td .coin img{width:22px;height:22px;border-radius:6px;object-fit:cover;background:var(--bg3)}
+.kind{display:inline-block;padding:3px 8px;border-radius:6px;font:400 10px var(--px);letter-spacing:.04em}
+.kind.BUY{background:#7ff0c81a;color:var(--mint)} .kind.SELL{background:#a4c5cf1a;color:var(--steel)}
+.kind.BUYBACK,.kind.BURN{background:#7ff0c833;color:var(--ice)} .kind.FEE{background:#ffffff0a;color:var(--mute)}
+td.th{color:var(--steel);max-width:420px;white-space:normal;line-height:1.4}
+td a{color:var(--steel2)} td a:hover{color:var(--ink)}
+.held{display:inline-block;width:8px;height:8px;background:var(--mint);margin-right:8px}
+.tempty{padding:30px;text-align:center;color:var(--mute);font:13px var(--mono)}
+
+/* how */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:34px}
+.step{border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:22px;display:flex;flex-direction:column;gap:12px}
+.step .ic{width:44px;height:44px}
+.step .no{font:400 10px var(--px);color:var(--dim);letter-spacing:.06em}
+.step h3{font-size:18px;letter-spacing:-.01em}
+.step p{color:var(--mute);font-size:14.5px;line-height:1.5}
+.step b{color:var(--ink);font-weight:500}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.box{border:1px solid var(--line);border-radius:14px;background:var(--bg2);padding:22px;min-width:0}
+.box h4{font:400 10px var(--px);letter-spacing:.06em;color:var(--dim);margin-bottom:14px}
+.box ul{list-style:none;display:flex;flex-direction:column;gap:10px;font-size:14.5px;color:var(--mute);line-height:1.45}
+.box li{display:flex;gap:10px}
+.box li::before{content:"";flex:none;width:6px;height:6px;margin-top:8px;background:var(--steel3)}
+.box li b{color:var(--ink);font-weight:500}
+.box pre{font:12.5px/1.75 var(--mono);color:var(--steel);white-space:pre-wrap;word-break:break-all}
+.box pre i{font-style:normal;color:var(--mint)}
+.addr{margin-top:14px;font:12.5px var(--mono);color:var(--mute);word-break:break-all}
+.addr a{color:var(--mint)}
+
+.cta{margin-top:86px;border:1px solid var(--line2);border-radius:18px;padding:44px 32px;text-align:center;background:radial-gradient(500px 200px at 50% 0%,#7ff0c812,transparent),var(--bg2)}
+.cta h2{margin:0 auto;max-width:none}
+.cta .ctas{justify-content:center}
+footer{margin-top:70px;border-top:1px solid var(--line)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:30px 50px;font:12px var(--mono);color:var(--dim)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,30px);opacity:0;transition:.25s;z-index:60;padding:10px 16px;border-radius:10px;background:var(--bg3);border:1px solid var(--line2);font:12.5px var(--mono);color:var(--steel);pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.rv{transition:opacity .7s,transform .7s cubic-bezier(.2,.8,.2,1)}
+.rv.pre{opacity:0;transform:translateY(18px)}
+@media (prefers-reduced-motion:reduce){.rv{transition:none}.live.on i{animation:none}}
+
+@media (max-width:1000px){
+  .hero{grid-template-columns:1fr;gap:36px;padding-block:36px 30px}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .stat:nth-child(4){border-left:0}
+  .stat:nth-child(n+4){border-top:1px solid var(--line)}
+  .steps{grid-template-columns:1fr 1fr}
+  .duo{grid-template-columns:1fr}
+  .links{display:none}
+}
+@media (max-width:560px){
+  .nav .wrap{gap:10px}
+  .nav .ca{display:none}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(odd){border-left:0}
+  .stat:nth-child(n+3){border-top:1px solid var(--line)}
+  .stat:nth-child(4){border-left:1px solid var(--line)}
+  .stat .v{font-size:20px}
+  .steps{grid-template-columns:1fr}
+  section{padding-block:64px 0}
+  .sub{font-size:16.5px}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="mark.png" alt="">QUANT</a>
+    <nav class="links"><a href="#holding">Holding</a><a href="#tape">Tape</a><a href="#radar">Radar</a><a href="#how">How it works</a><a href="#verify">Verify</a></nav>
+    <div class="sp"></div>
+    <button class="pill ca" id="caBtn"><span id="caTxt">$QUANT</span></button>
+    <a class="pill" id="xLink" target="_blank" rel="noopener" hidden>X</a>
+    <a class="pill solid" id="buyLink" target="_blank" rel="noopener" hidden>BUY $QUANT</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <span class="live" id="live"><i></i><span id="liveTxt">CONNECTING</span><b>STONKFUN</b></span>
+      <h1>An AI that trades StonkFun. <span class="px">Its wins buy $QUANT.</span></h1>
+      <p class="sub">QUANT's creator fees fund a trading wallet run by an AI. It reads the StonkFun board every five minutes, trades inside hard limits and writes its reason into every trade. <b>Half of every winning trade buys and burns $QUANT.</b></p>
+      <div class="ctas"><a class="pill solid" href="#tape">WATCH IT TRADE</a><a class="pill" href="#how">How it works</a></div>
+    </div>
+    <div class="crt" id="crt">
+      <div class="monitor" id="monitor">
+        <canvas id="bezel" width="200" height="176"></canvas>
+        <canvas id="screen"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats rv" id="stats">
+    <div class="stat"><span class="k">TREASURY</span><span class="v" id="sEq"><span class="sk"></span></span><span class="s" id="sEqU">&nbsp;</span></div>
+    <div class="stat"><span class="k">HOLDING</span><span class="v" id="sPos"><span class="sk"></span></span><span class="s">max 5 at once</span></div>
+    <div class="stat"><span class="k">WIN RATE</span><span class="v" id="sWin"><span class="sk"></span></span><span class="s" id="sWinS">&nbsp;</span></div>
+    <div class="stat"><span class="k">REALIZED</span><span class="v" id="sReal"><span class="sk"></span></span><span class="s">closed trades</span></div>
+    <div class="stat"><span class="k">FEES IN</span><span class="v" id="sFees"><span class="sk"></span></span><span class="s">from $QUANT trading</span></div>
+    <div class="stat"><span class="k">BOUGHT BACK</span><span class="v" id="sBuy"><span class="sk"></span></span><span class="s" id="sBurn">&nbsp;</span></div>
+  </div>
+
+  <section id="holding">
+    <div class="head"><div><div class="eyebrow rv"><svg data-ic="bag"></svg>HOLDING NOW</div><h2 class="rv">What it's in. <span class="m">And why.</span></h2></div></div>
+    <div class="pos" id="pos"></div>
+  </section>
+
+  <section id="tape">
+    <div class="eyebrow rv"><svg data-ic="tape"></svg>THE TAPE</div>
+    <h2 class="rv">Every trade, with its reason. <span class="m">Signed on-chain.</span></h2>
+    <div class="tbl rv"><div class="scroll"><table><thead><tr><th>TIME</th><th>ACTION</th><th>COIN</th><th class="r">SOL</th><th class="r">P&amp;L</th><th>WHY</th><th class="r">TX</th></tr></thead><tbody id="tapeBody"></tbody></table></div></div>
+  </section>
+
+  <section id="radar">
+    <div class="eyebrow rv"><svg data-ic="radar"></svg>ON ITS RADAR</div>
+    <h2 class="rv">The board it reads <span class="m">every five minutes.</span></h2>
+    <p class="lede rv">Graduated StonkFun coins by 24h volume with at least $25K of liquidity. This is the exact table the model sees.</p>
+    <div class="tbl rv"><div class="scroll"><table><thead><tr><th>COIN</th><th class="r">PRICE</th><th class="r">LIQ</th><th class="r">VOL 5M</th><th class="r">VOL 1H</th><th class="r">5M</th><th class="r">1H</th><th class="r">6H</th><th class="r">BUYS / SELLS 1H</th></tr></thead><tbody id="watchBody"></tbody></table></div></div>
+  </section>
+
+  <section id="how">
+    <div class="eyebrow rv"><svg data-ic="chip"></svg>HOW IT WORKS</div>
+    <h2 class="rv">Fees in. Trades out. <span class="m">Wins burn $QUANT.</span></h2>
+    <div class="steps">
+      <div class="step rv"><svg class="ic" data-ic="coin"></svg><span class="no">01</span><h3>Fees fund it</h3><p>Every $QUANT trade pays StonkFun's 1% pool fee. The creator half lands in the <b>agent wallet</b> about every five minutes.</p></div>
+      <div class="step rv"><svg class="ic" data-ic="radar"></svg><span class="no">02</span><h3>It reads the board</h3><p>Every five minutes the model gets the top StonkFun coins: price, liquidity, volume, momentum and <b>buy/sell flow</b>.</p></div>
+      <div class="step rv"><svg class="ic" data-ic="term"></svg><span class="no">03</span><h3>It trades in limits</h3><p>Max <b>15% per trade</b>, five positions, stop at <b>−25%</b>, half off at <b>+40%</b>, out after six hours. The reason goes in the memo.</p></div>
+      <div class="step rv"><svg class="ic" data-ic="fire"></svg><span class="no">04</span><h3>Wins burn $QUANT</h3><p>When a trade closes in profit, <b>half the profit buys $QUANT and burns it</b>. The other half stays in to trade.</p></div>
+    </div>
+    <div class="duo" id="verify">
+      <div class="box rv"><h4>THE LIMITS (ENFORCED IN CODE, NOT BY THE MODEL)</h4><ul>
+        <li><span><b>0.05 SOL</b> always stays in the wallet.</span></li>
+        <li><span>A buy is at most <b>15%</b> of tradable SOL, one new buy per tick.</span></li>
+        <li><span>Never more than <b>5</b> coins at once, never the same coin twice.</span></li>
+        <li><span><b>−25%</b> from cost sells everything. <b>+40%</b> sells half, once.</span></li>
+        <li><span>Anything held for <b>6 hours</b> is closed.</span></li>
+        <li><span>Only graduated StonkFun coins with <b>$25K+</b> liquidity.</span></li>
+      </ul></div>
+      <div class="box rv"><h4>VERIFY ANY TRADE</h4>
+<pre>buy      QUANT:BUY:<i>&lt;coin&gt;</i>:<i>&lt;lamports in&gt;</i>:<i>&lt;reason&gt;</i>
+sell     QUANT:SELL:<i>&lt;coin&gt;</i>:<i>&lt;lamports out&gt;</i>:<i>&lt;%&gt;</i>:<i>&lt;stop|tp|time|model&gt;</i>
+buyback  QUANT:BUYBACK:<i>&lt;lamports&gt;</i>
+burn     QUANT:BURN:<i>&lt;amount&gt;</i></pre>
+        <div class="addr" id="agentRow">Agent wallet: <span class="sk" style="width:20em"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta rv">
+    <h2>Hold $QUANT. <span class="m">Let it trade.</span></h2>
+    <p class="lede" style="margin-inline:auto">Every $QUANT trade funds the agent. Every winning trade it makes buys $QUANT back.</p>
+    <div class="ctas"><a class="pill solid" id="buyLink2" target="_blank" rel="noopener" href="#">BUY $QUANT</a><button class="pill" id="caBtn2">Copy CA</button></div>
+  </div>
+</main>
+
+<footer><div class="wrap"><span>QUANT · an AI trader on StonkFun</span><span>Trading is risky and the agent can lose. Not financial advice.</span></div></footer>
+<div class="toast" id="toast"></div>
+<script src="config.js"></script>
+<script>(()=>{var h=Object.assign({NAME:"QUANT",TICKER:"QUANT",CA:"",X:"",BUY:"",CHART:"",API:"/api"},window.QUANT_CFG||{}),l=e=>document.querySelector(e),c={agent:null,tape:null,watch:null,ok:!1,seen:new Set,booted:!1},A=e=>String(e).padStart(2,"0"),f=e=>String(e??"").replace(/[&<>"']/g,t=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[t]),b=e=>e?e.slice(0,4)+"\u2026"+e.slice(-4):"",g=(e,t=2)=>e==null||!isFinite(e)?"\u2014":Math.abs(e)>=1e3?e.toFixed(0):e.toFixed(t),X=(e,t=3)=>e==null||!isFinite(e)?"\u2014":(e>0?"+":"")+e.toFixed(t),L=e=>e==null||!isFinite(e)?"\u2014":(e>0?"+":"")+e.toFixed(1)+"%",I=e=>e==null||!isFinite(e)?"\u2014":e>=1e6?"$"+(e/1e6).toFixed(2)+"M":e>=1e3?"$"+(e/1e3).toFixed(1)+"K":"$"+e.toFixed(0);function lt(e){if(e==null||!isFinite(e))return"\u2014";if(e>=1)return"$"+e.toFixed(3);let t=e.toPrecision(3);return"$"+(t.includes("e")?e.toExponential(2):t)}var V=e=>{let t=new Date(e*1e3);return A(t.getUTCHours())+":"+A(t.getUTCMinutes())},J=e=>{let t=Date.now()/1e3-e;return t<90?Math.max(1,Math.round(t))+"s ago":t<5400?Math.round(t/60)+"m ago":Math.round(t/3600)+"h ago"},v=e=>e>0?"up":e<0?"dn":"";function x(e){let t=l("#toast");t.textContent=e,t.classList.add("show"),clearTimeout(x.t),x.t=setTimeout(()=>t.classList.remove("show"),2e3)}async function D(e){let t=await fetch(h.API+e,{headers:{accept:"application/json"}}),n=await t.json().catch(()=>({error:"bad response"}));if(!t.ok)throw new Error(n.error||t.status);return n}var at={bag:["....####....","...#....#...","..##########",".#..........#",".#...##.....#",".#..#..#....#",".#...##.....#",".#..........#",".############"],tape:["############","#..........#","#.##.###.#.#","#..........#","#.###.##.#.#","#..........#","#.#.###.##.#","#..........#","############"],radar:["....####....","..##....##..",".#...#....#.","#....#.....#","#....##....#","#.....##...#","#.......#..#",".#........#.","..##....##..","....####...."],chip:["..#.#.#.#...",".#########..","##.......##.",".#.#####.#..","##.#...#.##.",".#.#.#.#.#..","##.#####.##.",".#.......#..",".#########..","..#.#.#.#..."],coin:["...######...","..#......#..",".#..####..#.","#..#.......#","#..#.......#","#...###....#","#......#...#","#......#...#",".#.####..#.","..#......#..","...######..."],term:["############","#..........#","#.#........#","#..#.......#","#.#..###...#","#..........#","#..........#","############","....####....","..########.."],fire:[".....#......","....##......","....###..#..","...####.##..","..########..",".##########.",".###....###.",".##......##.","..##....##..","...######..."]};function rt(e){let t=at[e.dataset.ic];if(!t)return;let n=Math.max(...t.map(o=>o.length)),i=t.length;e.setAttribute("viewBox",`0 0 ${n} ${i}`),e.setAttribute("shape-rendering","crispEdges");let a="";t.forEach((o,u)=>[...o].forEach((m,T)=>{m==="#"&&(a+=`<rect x="${T}" y="${u}" width="1" height="1"/>`)})),e.innerHTML=a,e.setAttribute("fill",e.classList.contains("ic")?"var(--steel)":"currentColor")}document.querySelectorAll("svg[data-ic]").forEach(rt);var Z=l("#bezel"),ct=Z.getContext("2d"),d={x:24,y:22,w:152,h:100};function tt(e){let t=ct;t.clearRect(0,0,200,176);let n=(T,k,M,B,_)=>{t.fillStyle=_,t.fillRect(T,k,M,B)},i="#2a4b57",a="#b9d6df",o="#e4f3f7",u="#7fa3af",m="#5d8390";n(10,8,180,128,i),n(12,10,176,124,a),n(12,10,176,3,o),n(12,10,3,124,o),n(185,13,3,121,u),n(15,131,173,3,u),n(d.x-4,d.y-4,d.w+8,d.h+8,m),n(d.x-2,d.y-2,d.w+4,d.h+4,i),n(d.x,d.y,d.w,d.h,"#03100e"),n(132,126,28,3,m),n(160,125,4,4,e?"#7ff0c8":"#2f6b5a"),n(28,125,40,2,u),n(78,136,44,8,i),n(80,136,40,6,u),n(40,144,120,26,i),n(42,146,116,22,a),n(42,146,116,3,o),n(42,146,3,22,o),n(155,149,3,19,u),n(45,165,113,3,u),n(104,155,40,3,i),n(58,154,8,5,"#7ff0c8")}tt(!0);var R=760,F=500,C=document.createElement("canvas");C.width=R;C.height=F;var dt=C.getContext("2d"),r={lines:[],typing:null,queue:[],status:"booting",blink:0},E={mint:"#7ff0c8",steel:"#a4c5cf",dim:"#4f7680",ice:"#e4f3f7",loss:"#f29a8f",bg:"#03100e"};function y(e,t=!0){t?r.queue.push({segs:e,n:0}):r.lines.push(e)}function ut(e){if(!r.typing&&r.queue.length&&(r.typing=r.queue.shift()),r.typing){let t=r.typing.segs.reduce((n,i)=>n+i[0].length,0);r.typing.n+=e*(r.queue.length>6?260:95),r.typing.n>=t&&(r.lines.push(r.typing.segs),r.typing=null)}r.lines.length>60&&r.lines.splice(0,r.lines.length-60)}function ht(e){let t=dt;t.fillStyle=E.bg,t.fillRect(0,0,R,F);let n=p.clientWidth<460,i=n?27:17;t.font=`500 ${i}px "JetBrains Mono", ui-monospace, monospace`,t.textBaseline="top";let a=t.measureText("M").width,o=Math.round(i*1.36),u=22,m=new Date,T=c.agent?.equitySol;t.fillStyle="#0c2a26",t.fillRect(0,0,R,n?50:38),t.fillStyle=E.mint,t.fillText("QUANT://agent",u,10),t.fillStyle=E.steel;let k=n?T!=null?`EQ ${g(T)}`:"":`${A(m.getUTCHours())}:${A(m.getUTCMinutes())}:${A(m.getUTCSeconds())} UTC`+(T!=null?`   EQ ${g(T)} SOL`:"");t.fillText(k,R-u-t.measureText(k).width,10);let M=[...r.lines];r.typing&&M.push({partial:r.typing});let B=Math.floor((F-38-18-o)/o),_=M.slice(-B),U=52;for(let S of _){let G=u,ot=S.partial?S.partial.segs:S,$=S.partial?Math.floor(S.partial.n):1/0;for(let[H,z]of ot){let Y=$===1/0?H:H.slice(0,Math.max(0,$));if($!==1/0&&($-=H.length),t.fillStyle=E[z]||z,t.fillText(Y,G,U),G+=a*Y.length,$!==1/0&&$<=0)break}U+=o}t.fillStyle=E.mint,t.fillText(">",u,U),(Math.floor(e*2)%2===0||r.typing)&&(t.fillStyle=E.mint,t.fillRect(u+a*2,U+2,a*.9,o-6))}var p=l("#screen"),s=p.getContext("webgl",{antialias:!1,premultipliedAlpha:!1}),w,O,et,nt;if(s){let e="attribute vec2 p; varying vec2 v; void main(){ v=p*.5+.5; v.y=1.-v.y; gl_Position=vec4(p,0.,1.); }",t=`precision mediump float; varying vec2 v; uniform sampler2D t; uniform float time; uniform vec2 res;
+  vec2 bend(vec2 u){ u=u*2.-1.; u*=1.+.045*dot(u,u)*vec2(1.,1.15); return u*.5+.5; }
+  void main(){
+    vec2 u=bend(v);
+    if(u.x<0.||u.x>1.||u.y<0.||u.y>1.){ gl_FragColor=vec4(.012,.05,.045,1.); return; }
+    float ab=.0012;
+    vec3 c=vec3(texture2D(t,u+vec2(ab,0.)).r, texture2D(t,u).g, texture2D(t,u-vec2(ab,0.)).b);
+    vec3 glow=vec3(0.);
+    for(int i=-2;i<=2;i++){ for(int j=-2;j<=2;j++){ glow+=texture2D(t,u+vec2(float(i),float(j))*.0028).rgb; } }
+    glow/=25.;
+    c+=glow*.55;
+    float sl=.86+.14*sin(u.y*res.y*3.14159);
+    c*=sl;
+    float vig=smoothstep(.0,.35,u.x)*smoothstep(1.,.65,u.x)*smoothstep(.0,.3,u.y)*smoothstep(1.,.7,u.y);
+    c*=.55+.45*vig;
+    c*=.97+.03*sin(time*48.);
+    float roll=smoothstep(.0,.02,abs(fract(u.y-time*.06)-.5)) ;
+    c*=.96+.04*roll;
+    c+=vec3(.0,.025,.02);
+    gl_FragColor=vec4(c,1.);
+  }`,n=(o,u)=>{let m=s.createShader(o);return s.shaderSource(m,u),s.compileShader(m),m};w=s.createProgram(),s.attachShader(w,n(s.VERTEX_SHADER,e)),s.attachShader(w,n(s.FRAGMENT_SHADER,t)),s.linkProgram(w),s.useProgram(w);let i=s.createBuffer();s.bindBuffer(s.ARRAY_BUFFER,i),s.bufferData(s.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),s.STATIC_DRAW);let a=s.getAttribLocation(w,"p");s.enableVertexAttribArray(a),s.vertexAttribPointer(a,2,s.FLOAT,!1,0,0),O=s.createTexture(),s.bindTexture(s.TEXTURE_2D,O),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MIN_FILTER,s.LINEAR),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_MAG_FILTER,s.LINEAR),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_S,s.CLAMP_TO_EDGE),s.texParameteri(s.TEXTURE_2D,s.TEXTURE_WRAP_T,s.CLAMP_TO_EDGE),et=s.getUniformLocation(w,"time"),nt=s.getUniformLocation(w,"res")}function j(){let e=Z.getBoundingClientRect(),t=e.width/200;Object.assign(p.style,{left:d.x*t+"px",top:d.y*t+"px",width:d.w*t+"px",height:d.h*t+"px"});let n=Math.min(2,devicePixelRatio);p.width=Math.round(d.w*t*n),p.height=Math.round(d.h*t*n),s&&s.viewport(0,0,p.width,p.height)}addEventListener("resize",j);var W=performance.now(),q=!0,N=0;function st(e){let t=Math.min(.1,(e-W)/1e3);W=e;let n=e/1e3;ut(t),ht(n),s?(s.bindTexture(s.TEXTURE_2D,O),s.texImage2D(s.TEXTURE_2D,0,s.RGBA,s.RGBA,s.UNSIGNED_BYTE,C),s.uniform1f(et,n),s.uniform2f(nt,R*.5,F*.5),s.drawArrays(s.TRIANGLE_STRIP,0,4)):p.getContext("2d").drawImage(C,0,0,p.width,p.height),N+=t,N>(r.typing?.08:.9)&&(N=0,q=!q,tt(q||!c.ok)),requestAnimationFrame(st)}var K=l("#monitor");addEventListener("pointermove",e=>{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;let t=K.getBoundingClientRect(),n=(e.clientX-(t.left+t.width/2))/innerWidth,i=(e.clientY-(t.top+t.height/2))/innerHeight;K.style.transform=`rotateY(${n*10}deg) rotateX(${-i*8}deg)`});function ft(){y([["quant agent v1 \xB7 stonkfun","dim"]],!0),y([["reading the agent wallet\u2026","dim"]],!0)}function gt(e){let t=e.symbol?"$"+e.symbol:b(e.mint),n=V(e.t)+"  ";if(e.kind==="BUY")return[[[n,"dim"],["BUY   ","mint"],[t.padEnd(12),"ice"],[g(e.sol,3)+" SOL","steel"]],e.thesis?[["        "+e.thesis.slice(0,64),"steel"]]:null];if(e.kind==="SELL"){let i=e.pnlSol;return[[[n,"dim"],["SELL  ","steel"],[t.padEnd(12),"ice"],[g(e.sol,3)+" SOL  ","steel"],[i==null?"":X(i)+" SOL",i>=0?"mint":"loss"],[e.reason?"  ["+e.reason+"]":"","dim"]],e.thesis?[["        "+e.thesis.slice(0,64),"steel"]]:null]}return e.kind==="BUYBACK"?[[[n,"dim"],["BUYBACK ","mint"],["$"+h.TICKER+"  "+g(e.sol,3)+" SOL","ice"]],null]:e.kind==="BURN"?[[[n,"dim"],["BURN    ","mint"],["$"+h.TICKER+" burned","ice"]],null]:e.kind==="FEE"?[[[n,"dim"],["FEES IN ","dim"],["+"+g(e.sol,4)+" SOL","steel"]],null]:null}function mt(){let e=(c.tape?.rows||[]).slice().reverse(),t=e.filter(a=>!c.seen.has(a.sig)),n=!c.booted;if(n){if(c.booted=!0,!c.agent?.agent){y([["agent wallet not set yet","steel"]]);return}y([["wallet "+b(c.agent.agent)+" \xB7 equity "+g(c.agent.equitySol)+" SOL \xB7 "+(c.agent.positions?.length||0)+" open","steel"]]),e.length||y([["no trades yet. reading "+(c.watch?.rows?.length||0)+" coins.","steel"]])}let i=n?t.slice(-10):t;for(let a of e)c.seen.add(a.sig);for(let a of i){let o=gt(a);o&&(y(o[0]),o[1]&&y(o[1]))}}var pt=0;function yt(){let e=c.watch?.rows;if(!e||!e.length||r.queue.length||r.typing)return;let t=e[pt++%e.length];y([["scan  ","dim"],[("$"+(t.symbol||b(t.mint))).padEnd(12),"steel"],["1h "+L(t.chg1h).padEnd(8),t.chg1h>=0?"mint":"loss"],["b/s "+(t.buys1h??"\u2014")+"/"+(t.sells1h??"\u2014"),"dim"]])}function Q(e,t){c.ok=e,l("#live").classList.toggle("on",e),l("#liveTxt").textContent=t}function Tt(){let e=c.agent;if(!e)return;let t=e.stats||{};l("#sEq").innerHTML=e.equitySol!=null?`${g(e.equitySol)}<small>SOL</small>`:"\u2014",l("#sEqU").textContent=e.equityUsd!=null?I(e.equityUsd):"",l("#sPos").innerHTML=`${e.positions?.length||0}<small>/ 5</small>`;let n=(t.wins||0)+(t.losses||0);l("#sWin").innerHTML=n?`${Math.round((t.winRate??t.wins/n)*100)}<small>%</small>`:"\u2014",l("#sWinS").textContent=n?`${t.wins} won \xB7 ${t.losses} lost`:"no closed trades yet",l("#sReal").innerHTML=`<span class="${v(t.realizedSol)}">${X(t.realizedSol??0)}</span><small>SOL</small>`,l("#sFees").innerHTML=`${g(e.feesInSol??0,3)}<small>SOL</small>`,l("#sBuy").innerHTML=`${g(t.buybackSol??0,3)}<small>SOL</small>`;let i=t.burnedRaw&&+t.burnedRaw>0?Number(BigInt(t.burnedRaw)/1000n)/1e3:0;l("#sBurn").textContent=i?`${i.toLocaleString("en-US",{maximumFractionDigits:0})} $${h.TICKER} burned`:"nothing burned yet",l("#agentRow").innerHTML=e.agent?`Agent wallet: <a href="https://solscan.io/account/${f(e.agent)}" target="_blank" rel="noopener">${f(e.agent)} \u2197</a>`:"Agent wallet: not set yet.";let a=e.positions||[];l("#pos").innerHTML=a.length?a.map(o=>`
+    <div class="pcard ${o.pnlSol>0?"win":o.pnlSol<0?"lose":""}">
+      <div class="h">${o.image?`<img src="${f(o.image)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:'<img alt="" style="visibility:hidden">'}<span class="n">$${f(o.symbol||b(o.mint))}</span><span class="pnl ${v(o.pnlPct)}">${L(o.pnlPct)}</span></div>
+      <div class="th">${f(o.thesis||"no reason recorded")}</div>
+      <div class="f"><span>in <b>${g(o.costSol,3)}</b> \u2192 now <b>${g(o.valueSol,3)} SOL</b></span><span>${o.openedAt?"opened "+J(o.openedAt):""}</span></div>
+    </div>`).join(""):`<div class="empty">Holding nothing right now. ${e.agent?"It is reading the board.":"The agent wallet is not set yet."}</div>`}function wt(){let e=c.tape?.rows||[];l("#tapeBody").innerHTML=e.length?e.map(t=>`<tr>
+    <td>${V(t.t)}<br><span style="color:var(--dim);font-size:11px">${J(t.t)}</span></td>
+    <td><span class="kind ${f(t.kind)}">${f(t.kind)}</span></td>
+    <td>${t.mint?`<span class="coin">${t.image?`<img src="${f(t.image)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:""}$${f(t.symbol||b(t.mint))}</span>`:`$${h.TICKER}`}</td>
+    <td class="r">${g(t.sol,3)}</td>
+    <td class="r ${v(t.pnlSol)}">${t.pnlSol==null?"":X(t.pnlSol)}</td>
+    <td class="th">${f(t.thesis||(t.reason?"rule: "+t.reason:""))}</td>
+    <td class="r"><a href="https://solscan.io/tx/${f(t.sig)}" target="_blank" rel="noopener">${b(t.sig)} \u2197</a></td></tr>`).join(""):`<tr><td colspan="7" class="tempty">${c.agent?.agent?"No trades yet. The first one shows up here the moment it lands.":"The agent wallet is not set yet."}</td></tr>`}function bt(){let e=c.watch?.rows||[];l("#watchBody").innerHTML=e.length?e.map(t=>`<tr>
+    <td><span class="coin">${t.held?'<i class="held" title="held"></i>':""}${t.image?`<img src="${f(t.image)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`:""}$${f(t.symbol||b(t.mint))}</span></td>
+    <td class="r">${lt(t.priceUsd)}</td><td class="r">${I(t.liqUsd)}</td><td class="r">${I(t.vol5m)}</td><td class="r">${I(t.vol1h)}</td>
+    <td class="r ${v(t.chg5m)}">${L(t.chg5m)}</td><td class="r ${v(t.chg1h)}">${L(t.chg1h)}</td><td class="r ${v(t.chg6h)}">${L(t.chg6h)}</td>
+    <td class="r">${t.buys1h??"\u2014"} / ${t.sells1h??"\u2014"}</td></tr>`).join(""):'<tr><td colspan="9" class="tempty">No coins pass the filter right now.</td></tr>'}function $t(){l("#pos").innerHTML=Array.from({length:3},()=>'<div class="pcard"><div class="h"><span class="sk" style="width:34px;height:34px"></span><span class="sk" style="width:7em"></span></div><span class="sk" style="width:100%;height:2.4em"></span><span class="sk" style="width:60%"></span></div>').join("");let e=(t,n)=>Array.from({length:t},()=>`<tr>${Array.from({length:n},()=>'<td><span class="sk"></span></td>').join("")}</tr>`).join("");l("#tapeBody").innerHTML=e(5,7),l("#watchBody").innerHTML=e(6,9)}var P=0;async function it(){let[e,t,n]=await Promise.allSettled([D("/agent"),D("/tape?limit=50"),D("/watch")]);e.status==="fulfilled"&&(c.agent=e.value,Tt()),t.status==="fulfilled"&&(c.tape=t.value,wt()),n.status==="fulfilled"&&(c.watch=n.value,bt()),e.status==="fulfilled"&&t.status==="fulfilled"?(P=0,Q(!0,c.agent?.agent?"AGENT LIVE":"WAITING FOR AGENT"),mt()):(P++,Q(!1,"OFFLINE \xB7 RETRYING"),P===1&&y([["api offline \xB7 retrying every 15s","loss"]]))}function Et(){h.CA&&(l("#caTxt").textContent=b(h.CA));let e=()=>{if(!h.CA)return x("CA drops at launch");navigator.clipboard?.writeText(h.CA).then(()=>x("CA copied"),()=>x(h.CA))};l("#caBtn").addEventListener("click",e),l("#caBtn2").addEventListener("click",e),h.X&&(l("#xLink").href=h.X,l("#xLink").hidden=!1);let t=h.BUY||(h.CA?"https://www.stonkfun.xyz/token/"+h.CA:"");t?(l("#buyLink").href=t,l("#buyLink").hidden=!1,l("#buyLink2").href=t):(l("#buyLink2").removeAttribute("target"),l("#buyLink2").addEventListener("click",i=>{i.preventDefault(),x("CA drops at launch")}));let n=new IntersectionObserver(i=>i.forEach(a=>{a.isIntersecting&&(a.target.classList.remove("pre"),n.unobserve(a.target))}),{threshold:.1});document.querySelectorAll(".rv").forEach(i=>{i.getBoundingClientRect().top>innerHeight&&(i.classList.add("pre"),n.observe(i))})}Et();$t();j();ft();requestAnimationFrame(st);document.fonts?.ready.then(j);it();setInterval(it,15e3);setInterval(yt,4200);})();
+</script>
+</body>
+</html>
